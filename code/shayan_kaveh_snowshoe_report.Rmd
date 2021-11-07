@@ -1,0 +1,66 @@
+---
+title: "Snowshoe Hares - Bonanza Creek Experimental Project"
+author: "Shayan Kaveh"
+date: "11/6/2021"
+output: html_document
+---
+
+## Overview
+
+**Data citation:** Kielland, K., F.S. Chapin, R.W. Ruess, and Bonanza Creek LTER. 2017. Snowshoe hare physical data in Bonanza Creek Experimental Forest: 1999-Present ver 22. Environmental Data Initiative. <https://doi.org/10.6073/pasta/03dce4856d79b91557d8e6ce2cbcdc14>
+
+## Set Up
+
+```{r setup, include = FALSE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+library(tidyverse)
+library(here)
+library(lubridate)
+library(janitor)
+library(kableExtra)
+library(plotly)
+```
+
+# REMEMBER TO CHANGE TO `ECHO = FALSE` TO HIDE CODE AT THE END
+
+## Read in data
+
+```{r}
+hares <- read_csv(here("data", "bonanza_hares.csv")) %>% 
+  # Clean up data to create dates column
+  mutate(mdy = mdy(date)) %>% 
+  mutate(year = year(mdy))
+
+# Make a juvenile hare data set
+
+j_hares <- hares %>% 
+  filter(age == "j") %>% 
+  mutate(site = case_when(
+    grid == "bonrip" ~ "Bonrip",
+    grid == "bonmat" ~ "Bonmat",
+    grid == "bonbs" ~ "Bonbs")) %>% 
+  group_by(year) %>% 
+  mutate(count = n())
+```
+
+## Visualize Annual Juvenile Hair Trap Counts
+```{r}
+ggplot(data = j_hares, aes(x = year)) +
+  geom_histogram(bins = 15, color = "#8e715f", fill = "#fcefe4") +
+  # this is so extra, but my outline color is that of a snowshoe hare when it's brown and the fill color is their fur color in the winter... lol
+  scale_x_continuous(breaks = 1999:2012) +
+  theme_classic() +
+  labs(title = "Juvenile Snowshoe Hare Trap Count By Year",
+       x = "Year",
+       y = "Number of Hares") +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+```
+
+## Summarize these statistics
+
+```{r}
+j_hares_summary <- j_hares %>% 
+  summarize(mean_count = mean(year, na.rm = TRUE)) %>% 
+  summarize(median_count = median(year, na.rm = TRUE))
+```
+
