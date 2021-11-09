@@ -12,16 +12,17 @@ output: html_document
 ## Set Up
 
 ```{r setup, include = FALSE, message = FALSE, warning = FALSE}
-knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.align = 'center', out.extra = 'angle=90')
 library(tidyverse)
 library(here)
 library(lubridate)
 library(janitor)
 library(kableExtra)
 library(plotly)
+library(ggbeeswarm)
 ```
 
-# REMEMBER TO CHANGE TO `ECHO = FALSE` TO HIDE CODE AT THE END
+for analysis: assume normality & homosedaciticity 
 
 ## Read in data
 
@@ -29,7 +30,12 @@ library(plotly)
 hares <- read_csv(here("data", "bonanza_hares.csv")) %>% 
   # Clean up data to create dates column
   mutate(mdy = mdy(date)) %>% 
-  mutate(year = year(mdy))
+  mutate(year = year(mdy)) %>% 
+  filter(age == "j") %>% 
+  mutate(site = case_when(
+    grid == "bonrip" ~ "Bonrip",
+    grid == "bonmat" ~ "Bonmat",
+    grid == "bonbs" ~ "Bonbs"))
 
 # Make a juvenile hare data set
 
@@ -40,12 +46,12 @@ j_hares <- hares %>%
     grid == "bonmat" ~ "Bonmat",
     grid == "bonbs" ~ "Bonbs")) %>% 
   group_by(year) %>% 
-  mutate(count = n())
+  summarize(count = n())
 ```
 
-## Visualize Annual Juvenile Hair Trap Counts
+## Annual Juvenile Hair Trap Counts
 ```{r}
-ggplot(data = j_hares, aes(x = year)) +
+ggplot(data = hares, aes(x = year)) +
   geom_histogram(bins = 15, color = "#8e715f", fill = "#fcefe4") +
   # this is so extra, but my outline color is that of a snowshoe hare when it's brown and the fill color is their fur color in the winter... lol
   scale_x_continuous(breaks = 1999:2012) +
@@ -53,14 +59,68 @@ ggplot(data = j_hares, aes(x = year)) +
   labs(title = "Juvenile Snowshoe Hare Trap Count By Year",
        x = "Year",
        y = "Number of Hares") +
-  theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+  theme(plot.title = element_text(hjust = 0.5, face = "bold")) 
 ```
 
 ## Summarize these statistics
 
 ```{r}
 j_hares_summary <- j_hares %>% 
-  summarize(mean_count = mean(year, na.rm = TRUE)) %>% 
-  summarize(median_count = median(year, na.rm = TRUE))
+  summarize(mean_count = mean(count, na.rm = TRUE),
+            median_count = median(count, na.rm = TRUE),
+            sd_count = round(sd(count, na.rm = TRUE),1),
+            max_count = max(count),
+            min_count = min(count))
+
+j_hares_summary %>% 
+  kable(col.names = c("Mean Count",
+                      "Median Count",
+                      "Standard Deviation",
+                      "Maximum Count",
+                      "Minimum Count"),
+        caption = "<center>Table 1. Juvenile Hare Trap Count Statistics<center>",
+        digits = 2) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "center")
+```
+
+Takeaways:
+
+## Juvenile Hare Weights
+Create a finalized data visualization (or visualizations) in which you compare **juvenile hare weights by sex and site (grid)** (ignore other variables). You should include groups where these variables are not recorded (`NA`). Include finalized figure captions below your visualization(s).
+
+Then, in 2 - 3 sentences below your visualization(s) describe in text the main takeaways that you would want the audience to understand from your figures.
+
+Note: There are multiple ways to visualize these comparisons. We encourage you to think carefully then make decisions about how to visualize these comparisons, including:
+
+Can I use faceting to simplify the comparisons into manageable pieces?
+Am I showing the audience the data, summary statistics, or both?
+Have I updated graph labels, headers in facets, etc. to make it as straightforward as possible for viewers?
+Have I simplified and finalized my data visualization(s) to include components that are useful for the audience?
+
+```{r}
+gender_j_hares <- hares %>% 
+  mutate(sex = case_when(
+    sex == "m" ~ "Male",
+    sex == "f" ~ "Female"))
+
+ggplot(data = gender_j_hares, 
+       aes(x = sex, y = weight)) +
+  geom_beeswarm(aes(color = sex)) +
+  scale_color_manual(values = c("darkseagreen","lightcoral","indianred1")) +
+  geom_boxplot(fill = NA, width = 0.2, outlier.color = NA) +
+  stat_summary(fun=mean, 
+               geom="point", 
+               shape=20, 
+               size=4, 
+               color="black", 
+               fill="black") +
+  theme_grey() +
+  facet_wrap(~site) +
+  labs(x = "Sex",
+       y = "Weight (g)",
+       title = "Distribution of Juvenile Snowshoe Hare Weights by Sex",
+       color = "Sex") + # "color = " changes legend title 
+  theme(plot.title = element_text(hjust = 0.5),
+        legend.key = element_rect(fill = "white"))
 ```
 
