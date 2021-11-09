@@ -12,7 +12,7 @@ output: html_document
 ## Set Up
 
 ```{r setup, include = FALSE, message = FALSE, warning = FALSE}
-knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.align = 'center', out.extra = 'angle=90')
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.align = 'center', out.extra = 'angle = 90')
 library(tidyverse)
 library(here)
 library(lubridate)
@@ -157,8 +157,8 @@ juvenile_hares_summary %>%
 ```
 
 ```{r, include = FALSE}
-
 # Exploratory graphs
+
 ggplot(data = gender_j_hares, aes(sample = weight)) +
   geom_qq() +
   facet_wrap(~sex)
@@ -186,6 +186,9 @@ sex_t <- t.test(male_juvenile_hares, female_juvenile_hares)
 sex_cohen <- cohen.d(female_juvenile_hares, male_juvenile_hares)
 ```
 
+
+4. Juvenile Weight & Hind Foot Length
+
 Relationship between juvenile weight & hind foot length. Explore the relationship between juvenile snowshoe hare hind foot length (variable `hindft`, recorded in millimeters), and weight. Include all juvenile hares in the study. Create a final visualization of juvenile hare hind foot length versus weight. Include a figure caption.
 
 Upon seeing your graph, your “boss” tells you to try out linear regression to describe how juvenile snowshoe hare weight changes with respect to hind foot length. Try it out (the only variables you are expected to include here are hind foot length and weight, using data for all juvenile hares in the data, e.g. you are not expected to explore impacts of sex, site, etc.), and check the model diagnostics.
@@ -193,6 +196,20 @@ Upon seeing your graph, your “boss” tells you to try out linear regression t
 In 2 - 3 sentences below your figure, describe the outcome of your linear regression exploration (e.g. slope interpretation, R2 value, and Pearson's r correlation) and touch briefly on which assumption(s) of linear regression may be a concern, and additional thoughts you have about how well (or not well…) the linear model describes the relationship. What worries you? 
 
 ```{r}
-
+ggplot(data = gender_j_hares, 
+       aes(x = weight, y = hindft)) +
+  geom_point(aes(color = sex, pch = sex)) +
+  geom_smooth(method = "lm", se = FALSE, color = "gray30") +
+  theme_gray() +
+  theme(legend.position = c(0.85, 0.2),
+        legend.key = element_rect(fill = "white"),
+        plot.title = element_text(hjust = 0.5)) +
+   scale_color_manual(values = c("goldenrod2","cyan4","coral"), 
+                     name = "Hare Sex") +
+  scale_shape_manual(values = c(16,17,18), 
+                     name = "Hare Sex") +
+  labs(x = "Weight (g)",
+       y = "Hind Foot (mm)",
+       title = "Hind Foot Compared to Weight of Juvenile Hares") 
 ```
 
