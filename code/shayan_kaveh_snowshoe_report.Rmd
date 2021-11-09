@@ -20,6 +20,7 @@ library(janitor)
 library(kableExtra)
 library(plotly)
 library(ggbeeswarm)
+library(effsize)
 ```
 
 for analysis: assume normality & homosedaciticity 
@@ -122,5 +123,76 @@ ggplot(data = gender_j_hares,
        color = "Sex") + # "color = " changes legend title 
   theme(plot.title = element_text(hjust = 0.5),
         legend.key = element_rect(fill = "white"))
+```
+
+Juvenile weight comparison (male & female snowshoe hares). Further compare mean weights for **juvenile male and female snowshoe hares** included in this study. In this section, you should include:
+
+A finalized table containing the mean, standard deviation, and sample size for male and female juvenile snowshoe hares, with a table caption (remember, a table caption should be placed *above* the table in your report)
+A 2 - 3 sentence comprehensive statement of the means comparison, including at least:
+The actual difference in means
+Effect size (Cohen's *d*) (see effsize::cohen.d() example in the Lab 5 key)
+Outcome of an unpaired two-sample t-test
+
+```{r}
+juvenile_hares_summary <- gender_j_hares %>% 
+  group_by(sex) %>% 
+  summarize(mean = mean(weight, na.rm = TRUE),
+            median = median(weight, na.rm = TRUE),
+            sd = sd(weight, na.rm = TRUE),
+            sample = n(),
+            max = max(weight, na.rm = TRUE),
+            min = min(weight, na.rm = TRUE))
+
+juvenile_hares_summary %>% 
+  kable(col.names = c("Sex",
+                      "Mean",
+                      "Median",
+                      "Standard Deviation",
+                      "Sample Size",
+                      "Max Weight",
+                      "Minimum Weight"),
+        caption = "<center>Juvenile Hare Weight (g) Summary<center>",
+        digits = 2) %>% 
+  kable_styling(bootstrap_options = "striped", full_width = F, position = "center")
+```
+
+```{r, include = FALSE}
+
+# Exploratory graphs
+ggplot(data = gender_j_hares, aes(sample = weight)) +
+  geom_qq() +
+  facet_wrap(~sex)
+
+ggplot(data = gender_j_hares, aes(x = weight)) +
+  geom_histogram(bins = 15) +
+  facet_wrap(~sex)
+```
+
+
+```{r}
+# Cohen D Test
+male_juvenile_hares <- gender_j_hares %>% 
+  filter(sex == "Male") %>% 
+  drop_na(weight) %>% 
+  pull(weight) 
+  
+female_juvenile_hares <- gender_j_hares %>% 
+  filter(sex == "Female") %>% 
+  drop_na(weight) %>% 
+  pull(weight)  
+  
+sex_t <- t.test(male_juvenile_hares, female_juvenile_hares)
+
+sex_cohen <- cohen.d(female_juvenile_hares, male_juvenile_hares)
+```
+
+Relationship between juvenile weight & hind foot length. Explore the relationship between juvenile snowshoe hare hind foot length (variable `hindft`, recorded in millimeters), and weight. Include all juvenile hares in the study. Create a final visualization of juvenile hare hind foot length versus weight. Include a figure caption.
+
+Upon seeing your graph, your “boss” tells you to try out linear regression to describe how juvenile snowshoe hare weight changes with respect to hind foot length. Try it out (the only variables you are expected to include here are hind foot length and weight, using data for all juvenile hares in the data, e.g. you are not expected to explore impacts of sex, site, etc.), and check the model diagnostics.
+
+In 2 - 3 sentences below your figure, describe the outcome of your linear regression exploration (e.g. slope interpretation, R2 value, and Pearson's r correlation) and touch briefly on which assumption(s) of linear regression may be a concern, and additional thoughts you have about how well (or not well…) the linear model describes the relationship. What worries you? 
+
+```{r}
+
 ```
 
