@@ -74,7 +74,7 @@ ggplot(data = j_hares, aes(x = year)) +
 
 ##### Summary Statistics
 <center>
-**Table 1.** Juvenile Hare Trap Count Statistics
+**Table 1.** Juvenile Hare Trap Count Statistics. Data: (Kielland et al. 2017).
 </center>
 ```{r, fig.align = 'center'}
 j_hares_summary <- j_hares_count %>% 
@@ -145,22 +145,23 @@ ggplot(data = gender_j_hares,
 
 ```{r, fig.align = 'center'}
 juvenile_hares_summary <- gender_j_hares %>% 
+  filter(sex != "NA", weight != "NA") %>% 
   group_by(sex) %>% # group by sex to make sure that means are separated by sex (as desired)
   summarize(mean = mean(weight, na.rm = TRUE),
             median = median(weight, na.rm = TRUE),
             sd = sd(weight, na.rm = TRUE),
-            sample = n(),
             max = max(weight, na.rm = TRUE),
-            min = min(weight, na.rm = TRUE))
+            min = min(weight, na.rm = TRUE),
+            sample = n())
 
 juvenile_hares_summary %>% 
   kable(col.names = c("Sex", # this messed me up... because I grouped by sex, sex MUST be included as part of the vector because it is separated and represented as its own section in the data
-                      "Mean",
-                      "Median",
-                      "Standard Deviation",
-                      "Sample Size",
-                      "Max Weight",
-                      "Minimum Weight"),
+                      "Mean Weight (g)",
+                      "Median Weight (g)",
+                      "Standard Deviation (g)",
+                      "Max Weight (g)",
+                      "Minimum Weight (g)",
+                      "Sample Size"),
         digits = 2) %>% # digits used here to round the statistics when shown, rather than edit the actual statistics if they were to be used for something else
   kable_styling(bootstrap_options = "striped", full_width = F)
 ```
