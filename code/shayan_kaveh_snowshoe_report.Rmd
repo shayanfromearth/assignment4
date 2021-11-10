@@ -111,7 +111,7 @@ gender_j_hares <- j_hares %>%
 
 ggplot(data = gender_j_hares, 
        aes(x = sex, y = weight)) +
-  geom_beeswarm(aes(color = sex)) + # have to attach library(ggbeeswarm) to be able to use beeswarm plots
+  geom_beeswarm(aes(color = sex), show.legend = FALSE) + # have to attach library(ggbeeswarm) to be able to use beeswarm plots
   scale_color_manual(values = c("darkseagreen","lightcoral","indianred1")) + 
   geom_boxplot(fill = NA, width = 0.2, outlier.color = NA) + # include the box plot to overlay statistics over the beeswarm and make it a little cleaner
   stat_summary(fun=mean, # ok so i stole this from Alison, but it includes the mean in the boxplot
@@ -122,7 +122,7 @@ ggplot(data = gender_j_hares,
                fill="black") +
   theme_grey() + # used theme_grey here to make it easier to see the distinction between the facets
   facet_wrap(~site) +
-  labs(x = "Sex",
+  labs(x = "\nSex",
        y = "Weight (g)",
        title = "Distribution of Juvenile Snowshoe Hare Weights by Sex",
        color = "Sex") + # "color = " changes legend title 
@@ -135,7 +135,7 @@ ggplot(data = gender_j_hares,
 
 ------------------------------------------------------------------------
 
-#### Statistics of Juvenile Hare Weights by Sex & Site
+#### Statistics of Juvenile Hare Weights
 
 <center>
 
@@ -211,9 +211,9 @@ ggplot(data = gender_j_hares,
   geom_point(aes(color = sex, pch = sex)) +
   geom_smooth(method = "lm", se = FALSE, color = "gray41") +
   theme_minimal() +
-  theme(legend.position = c(0.15, 0.8),
-        legend.key = element_rect(fill = "white"),
-        plot.title = element_text(hjust = 0.5)) +
+  theme(legend.position = c(0.1335, 0.8),
+        plot.title = element_text(hjust = 0.5),
+        legend.box.background = element_rect(fill = "white", color = "gray")) +
    scale_color_manual(values = c("darkseagreen","lightcoral","indianred1"), 
                      name = "Sex") +
   scale_shape_manual(values = c(15, 16, 17), 
@@ -245,7 +245,7 @@ hare_lm_tidy <- tidy(hare_lm) #tidying lm
 # hare_lm_tidy #viewing tidy lm
 ```
 
-**Findings:** This graph shows the linear relationship between juvenile hare weight and hind foot length, which shows a relatively linear relationship. Simple linear regression showed that hind foot length predicts snowshoe hare weight (p < 0.001, R^2 = `r round(hare_lm_glance$r.squared, 2)`) with an average slope of $\beta$ = `r round(hare_lm_tidy$estimate[2], 1)` g mm^-1^. This means that with one millimeter increase in hind foot length, we expect an average increase in hare weight of `r round(hare_lm_tidy$estimate[2], 1)` g. Hind foot length and hare weight are significantly positively correlated, according to this linear regression (Pearson's *r* = `r round(hare_cor_tidy$estimate, 2)`, p < 0.001). In this case, the linear regression ignores if homoscedasticity is normal. The variance of standard error seems not homogeneous throughout the sample, and I believe linear regression is not well met for a linear regression to represent the relationship of hind foot length with hare weight appropriately. 
+**Findings:** This graph shows the linear relationship between juvenile hare weight and hind foot length, which shows a linear relationship that is not very strong. Simple linear regression showed that hind foot length does not do the best job at predicting snowshoe hare weight (p < 0.001, R^2 = `r round(hare_lm_glance$r.squared, 2)`) with an average slope of $\beta$ = `r round(hare_lm_tidy$estimate[2], 1)` g mm^-1^. This means that with one millimeter increase in hind foot length, we expect an average increase in hare weight of `r round(hare_lm_tidy$estimate[2], 1)` g. Hind foot length and hare weight are positively correlated, according to this linear regression (Pearson's *r* = `r round(hare_cor_tidy$estimate, 2)`, p < 0.001), but the relationship is not strong. In this case, the linear regression ignores if homoscedasticity is normal. The variance of standard error seems not homogeneous throughout the sample, especially for male snowshoe hares. I believe the data does not meet the conditions for a linear regression to accurately represent the relationship of hind foot length with hare weight.
 
 ------------------------------------------------------------------------
 
@@ -255,7 +255,8 @@ This exploratory data analysis reveals the following:
 
 - The number of juvenile hare trap counts declined overall from the beginning of sampling in 1999 to the end in 2012.
 - Male and female juvenile snowshoe hares have a statistically significant difference in mean weights, although the effect size is small. 
-- Juvenile hare hind foot length and weight have a relatively linear relationship, as defined by simple linear regression. The linear regressions shows suggests that we can expect on average that with every 1 mm increase in hind foot length that hare weight will increase by `r round(hare_lm_tidy$estimate[2], 1)` g mm^-1^.
+- Juvenile hare hind foot length and weight do not have a strong linear relationship, as defined by simple linear regression. The linear regressions shows suggests that we can expect on average that with every 1 mm increase in hind foot length that hare weight will increase by `r round(hare_lm_tidy$estimate[2], 1)` g mm^-1^, but the low Pearson's r value and R^2 suggest this trend is not a good representation of these characteristics in snowshoe hares.
+
 
 
 ------------------------------------------------------------------------
