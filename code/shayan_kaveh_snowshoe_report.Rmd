@@ -19,6 +19,7 @@ The snowshoe hare physical data was published by Knut Kielland and colleagues fr
 
 ------------------------------------------------------------------------
 
+
 ```{r setup, include = FALSE, message = FALSE, warning = FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 # Code Set Up
